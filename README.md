@@ -3,6 +3,7 @@
 Quick 'n' dirty bitmap renderer for a mandelbrot set in C.
 
 ![Mandelbrot](example.bmp)
+*This image is a 4k render, so it's pretty weighty: 23mb according to GitHub!*
 
 Requirements:
 * GNU Make
