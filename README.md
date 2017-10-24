@@ -2,7 +2,7 @@
 
 Quick 'n' dirty bitmap renderer for a mandelbrot set in C.
 
-![Mandelbrot](example.png)
+![Mandelbrot](example.bmp)
 
 Requirements:
 * GNU Make
