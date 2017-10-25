@@ -2,15 +2,21 @@
 #include <stdlib.h>
 #include <complex.h>
 
-#define MAX_X 384
-#define MAX_Y 216
+#define MAX_X 1920
+#define MAX_Y 1080
+#define ASPECT_RATIO ((double)MAX_X/(double)MAX_Y)
 
-#define X_LOWER -2.5
-#define X_UPPER 1.0555555
-#define Y_LOWER -1
-#define Y_UPPER 1
+#define ZOOM 0.9
+#define CENTRE_X -0.722222
+#define CENTRE_Y 0
+
+#define X_LOWER (CENTRE_X - (ASPECT_RATIO * ZOOM)) 
+#define X_UPPER (CENTRE_X + (ASPECT_RATIO * ZOOM))
+#define Y_LOWER (CENTRE_Y - ZOOM)
+#define Y_UPPER (CENTRE_Y + ZOOM)
 
 #define MAX_ITERATIONS 255
+
 
 enum COLOR {
   RED, GREEN, BLUE
@@ -39,7 +45,6 @@ double linmap(double val, double lower1, double upper1, double lower2, double up
 
 /* Calculate the colour for coordinates (x, y) and write into color[]. */
 void get_color(int x, int y, int maxX, int maxY, unsigned char color[]) {
-
   // Calculate the viewport of our render.
   double x1 = linmap(x, 0, maxX, X_LOWER, X_UPPER);
   double y1 = linmap(y, 0, maxY, Y_LOWER, Y_UPPER);
@@ -92,6 +97,8 @@ int main(int argc, char *argv[]) {
     dimy = atoi(argv[2]);
   }
 
+  printf("Rendering file at %dx%d resolution.\n", dimx, dimy);
   generate_file(dimx, dimy);
+  printf("Render complete!\n");
   return EXIT_SUCCESS;
 }
