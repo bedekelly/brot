@@ -12,6 +12,10 @@
 
 #define MAX_ITERATIONS 255
 
+enum COLOR {
+  RED, GREEN, BLUE
+};
+
 
 /* Calculate the number of iterations a point takes to leave a bound. */
 int iterations(double cr, double ci, int max_it) {
@@ -35,19 +39,21 @@ double linmap(double val, double lower1, double upper1, double lower2, double up
 
 /* Calculate the colour for coordinates (x, y) and write into color[]. */
 void get_color(int x, int y, int maxX, int maxY, unsigned char color[]) {
+
+  // Calculate the viewport of our render.
   double x1 = linmap(x, 0, maxX, X_LOWER, X_UPPER);
   double y1 = linmap(y, 0, maxY, Y_LOWER, Y_UPPER);
+
+  // How many iterations before this complex value "escapes" our bound of 4?
   int its = iterations(x1, y1, MAX_ITERATIONS);
 
-  double t = (double)its/(double)MAX_ITERATIONS;
+  // Normalise number of iterations to a value in [0, 1].
+  double t = (double) its / (double) MAX_ITERATIONS;
 
-  char r = (int)(9*(1-t)*t*t*t*255);
-  char g = (int)(15*(1-t)*(1-t)*t*t*255);
-  char b =  (int)(8.5*(1-t)*(1-t)*(1-t)*t*255);
-
-  color[0] = r;
-  color[1] = g;
-  color[2] = b;
+  // Calculate values for Bernstein Polynomials in [0, 255] interval.
+  color[RED] = linmap(8.5 * (1-t) * (1-t) * (1-t) * t, 0, 1, 0, 255);
+  color[GREEN] = linmap(15 * (1-t) * (1-t) * t*t, 0, 1, 0, 255);
+  color[BLUE] = linmap(9 * (1-t) * t*t*t, 0, 1, 0, 255);
 }
 
 
