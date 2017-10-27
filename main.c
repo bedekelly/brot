@@ -2,21 +2,16 @@
 #include <stdlib.h>
 #include <complex.h>
 
-#define MAX_X 1920
-#define MAX_Y 1080
-#define ASPECT_RATIO ((double)MAX_X/(double)MAX_Y)
-
-#define ZOOM 0.9
-#define CENTRE_X -0.722222
-#define CENTRE_Y 0
-
-#define X_LOWER (CENTRE_X - (ASPECT_RATIO * ZOOM)) 
-#define X_UPPER (CENTRE_X + (ASPECT_RATIO * ZOOM))
-#define Y_LOWER (CENTRE_Y - ZOOM)
-#define Y_UPPER (CENTRE_Y + ZOOM)
-
+// Default resolution.
 #define MAX_ITERATIONS 255
 
+// double CENTRE_X = -0.722222;
+// double CENTRE_Y = 0;
+// double CENTRE_X = -1.7400623825;
+// double CENTRE_Y = 0.028175339779;
+
+double CENTRE_X = -0.74834786263068993619;
+double CENTRE_Y = -0.063037465497871903373;
 
 enum COLOR {
   RED, GREEN, BLUE
@@ -44,7 +39,14 @@ double linmap(double val, double lower1, double upper1, double lower2, double up
 
 
 /* Calculate the colour for coordinates (x, y) and write into color[]. */
-void get_color(int x, int y, int maxX, int maxY, unsigned char color[]) {
+void get_color(int x, int y, int maxX, int maxY, double ZOOM, unsigned char color[]) {
+
+  double ASPECT_RATIO = (double)maxX / (double)maxY;
+  double X_LOWER = (CENTRE_X - (ASPECT_RATIO * ZOOM));
+  double X_UPPER = (CENTRE_X + (ASPECT_RATIO * ZOOM));
+  double Y_LOWER = (CENTRE_Y - ZOOM);
+  double Y_UPPER = (CENTRE_Y + ZOOM);
+
   // Calculate the viewport of our render.
   double x1 = linmap(x, 0, maxX, X_LOWER, X_UPPER);
   double y1 = linmap(y, 0, maxY, Y_LOWER, Y_UPPER);
@@ -71,17 +73,21 @@ void write_header(FILE *fp, int dimx, int dimy) {
 
 
 /* Generate a Mandelbrot image. */
-void generate_file(int dimx, int dimy) {
+void generate_file(int dimx, int dimy, double ZOOM, int frameNo) {
   int i, j;
-  FILE *fp = fopen("mandelbrot.ppm", "wb");
+
+  char filename[0x20];
+  snprintf(filename, sizeof(filename), "frames/frame-%d.ppm", frameNo);
+  FILE *fp = fopen(filename, "wb");
+
   write_header(fp, dimx, dimy);
 
   unsigned char color[3];
-  
+
   for (j=0; j<dimy; ++j)
     for (i=0; i<dimx; ++i)
       {
-	get_color(i, j, dimx, dimy, color);
+	get_color(i, j, dimx, dimy, ZOOM, color);
 	fwrite(color, 1, 3, fp);
       }
 
@@ -90,15 +96,19 @@ void generate_file(int dimx, int dimy) {
 
 
 int main(int argc, char *argv[]) {
-  int dimx = MAX_X, dimy = MAX_Y;
+  int dimx = atoi(argv[1]);
+  int dimy = atoi(argv[2]);
+  int secs = atoi(argv[3]);
+  int fps = atoi(argv[4]);
 
-  if (argc == 3) {
-    dimx = atoi(argv[1]);
-    dimy = atoi(argv[2]);
+  double ZOOM = 2;
+  
+  for (int i=0; i<secs*fps; i++) {
+    generate_file(dimx, dimy, ZOOM, i);
+    ZOOM *= 0.97;
+    if (i % (fps/4) == 0)
+      printf("%.2f%% done!\n", 100 * (double)i/(secs*fps));
   }
 
-  printf("Rendering file at %dx%d resolution.\n", dimx, dimy);
-  generate_file(dimx, dimy);
-  printf("Render complete!\n");
   return EXIT_SUCCESS;
 }
