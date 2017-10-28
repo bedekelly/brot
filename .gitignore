@@ -2,3 +2,7 @@ main
 mandelbrot.*
 .DS_Store
 frames
+Good Videos
+videos
+*.bak
+*~
