@@ -1,8 +1,8 @@
-DURATION=25  #seconds
-FRAMES_PER_SECOND=30
+DURATION=1  #seconds
+FRAMES_PER_SECOND=5
 FILENAME=`date '+%Y-%m-%d_%H:%M:%S'`
-WIDTH=3840
-HEIGHT=2160
+WIDTH=1920
+HEIGHT=1080
 RESOLUTION=${WIDTH}x$HEIGHT
 
 # Cleanup the frames directory.
@@ -12,11 +12,11 @@ mkdir -p frames &&
     rm -f frames/*.ppm
 
 # Process alternating frames in parallel and wait for all to complete.
-./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 0 4 & P1=$!
-./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 1 4 & P2=$!
-./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 2 4 & P3=$!
-./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 3 4 & P4=$!
-wait $P1 $P2 $P3 $P4
+time ./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 0 4 & P1=$!
+time ./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 1 4 & P2=$!
+time ./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 2 4 & P3=$!
+time ./main $WIDTH $HEIGHT $DURATION $FRAMES_PER_SECOND 3 4 & P4=$!
+time wait $P1 $P2 $P3 $P4
 
 # Even if we only render some of the frames, stitch the video together.
 cd frames &&
